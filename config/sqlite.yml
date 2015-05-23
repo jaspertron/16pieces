@@ -1,0 +1,20 @@
+Default: &defaults
+  database: 16pieces.sqlite3
+  poolsize: 10
+
+Development:
+  <<: *defaults
+
+Testing:
+  database: 16pieces_test.sqlite3
+  <<: *defaults
+
+Staging:
+  database: 16pieces_staging.sqlite3
+  poolsize: 100
+  <<: *defaults
+
+Production:
+  database: 16pieces_production.sqlite3
+  poolsize: 100
+  <<: *defaults
