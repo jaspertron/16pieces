@@ -1,0 +1,15 @@
+html, body
+  height: 100%
+#wrap
+  display: table
+  min-height: 100%
+  height: auto
+  margin: 0 auto -60px
+  padding: 0 0 60px
+.footer
+  height: 60px
+  padding-top: 20px
+#main
+  display: table-cell
+  vertical-align: middle
+

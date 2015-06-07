@@ -1,3 +1,4 @@
+{-# LANGUAGE StandaloneDeriving #-}
 module Foundation where
 
 import Import.NoFoundation
@@ -7,6 +8,23 @@ import Text.Jasmine         (minifym)
 import Yesod.Default.Util   (addStaticContentExternal)
 import Yesod.Core.Types     (Logger)
 import qualified Yesod.Core.Unsafe as Unsafe
+import Chess(Color(..))
+
+type Password = Text
+type Move = Text
+type JoinCode = Text
+
+deriving instance Read Color
+
+instance PathPiece Color where
+
+  toPathPiece Black = "b"
+  toPathPiece White = "w"
+
+  fromPathPiece "b" = Just Black
+  fromPathPiece "w" = Just White
+  fromPathPiece _ = Nothing
+
 
 -- | The foundation datatype for your application. This can be a good place to
 -- keep settings and values requiring initialization before your application
@@ -18,6 +36,8 @@ data App = App
     , appConnPool    :: ConnectionPool -- ^ Database connection pool.
     , appHttpManager :: Manager
     , appLogger      :: Logger
+    -- currently, the only purpose of the game cache is to allow for long polling (using STM retry)
+    , appGameCache   :: TVar (Map GameId (TVar Game))
     }
 
 instance HasHttpManager App where

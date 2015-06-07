@@ -3,4 +3,9 @@
 /favicon.ico FaviconR GET
 /robots.txt RobotsR GET
 
-/ HomeR GET POST
+/                                      HomeR        GET
+/newgame                               NewGameR     POST
+/game/#GameId/#Color/#Password         GameR        GET
+/move/#GameId/#Color/#Password/#Move   MoveR        POST
+/join/#GameId/#Text                    JoinR        GET POST
+

@@ -1,5 +1,12 @@
 name:              16pieces
 version:           0.0.0
+license:           MIT
+license-file:      LICENSE
+author:            ajaspertron@gmail.com
+maintainer:        ajaspertron@gmail.com
+category:          Game
+synopsis:          Simple multiplayer chess webapp
+homepage:          https://github.com/jaspertron/16pieces
 cabal-version:     >= 1.8
 build-type:        Simple
 
@@ -21,7 +28,7 @@ library
                      Settings
                      Settings.StaticFiles
                      Handler.Common
-                     Handler.Home
+                     Handler.Chess
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT
@@ -81,6 +88,10 @@ library
                  , containers
                  , vector
                  , time
+                 -- end scaffolding
+                 , hchesslib
+                 , random
+                 , stm
 
 executable         16pieces
     if flag(library-only)
