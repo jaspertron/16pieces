@@ -7,7 +7,7 @@ var buildGame = function(gameId, password, fen, color){
         .done(function(moveResponse){
           game.load(moveResponse.fen);
           board.position(game.fen());
-          setStatus("Waiting for opponent");})
+          updateStatus();})
         .fail(function(xhr){
           console.log('Illegal move');
           game.load(preMoveFen);
