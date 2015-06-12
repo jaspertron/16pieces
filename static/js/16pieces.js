@@ -7,7 +7,7 @@ var buildGame = function(gameId, password, fen, color){
         .done(function(moveResponse){
           game.load(moveResponse.fen);
           board.position(game.fen());
-          updateStatus();})
+          updateStatus(false);})
         .fail(function(xhr){
           console.log('Illegal move');
           game.load(preMoveFen);
@@ -51,7 +51,7 @@ var buildGame = function(gameId, password, fen, color){
         board.position(game.fen());
         if(data.joincode === null) $('#joincode-message').slideUp();})
       .complete(function(){
-        updateStatus();
+        updateStatus(!opponentsTurn()); //only notify on our turn
         if (opponentsTurn()) window.setTimeout(pollServer, 1000);
       });
     };
@@ -62,12 +62,36 @@ var buildGame = function(gameId, password, fen, color){
       $('#status').text(s);
       document.title = s;
     };
-    var updateStatus = function(){
-        if (game.in_checkmate()) setStatus(opponentsTurn()? "Checkmate! You won!" : "Checkmate! You lost!");
-        else if (game.in_draw() || game.in_stalemate() || game.in_threefold_repetition()) setStatus("Alright, we'll call it a draw.");
-        else setStatus(opponentsTurn()? "Waiting for opponent" : "It's your turn");
+    var updateStatus = function(shouldNotify){
+      var draw = game.in_draw() || game.in_stalemate() || game.in_threefold_repetition();
+      var message;
+      if (game.in_checkmate()) {
+        message = opponentsTurn() ? "Checkmate! You won!" : "Checkmate! You lost!";
+      } else if (draw) {
+        message = "Alright, we'll call it a draw.";
+      } else {
+        message = opponentsTurn() ? "Waiting for opponent" : "It's your turn";
+      }
+      setStatus(message);
+      if(shouldNotify) notify(message);
+    };
+    var notify = function(s){
+      if (!("Notification" in window)) {
+        console.log("notifications aren't supported in this browser");
+        return;
+      }
+      else if (Notification.permission === "granted") {
+        new Notification(s);
+      }
+      else if (Notification.permission !== "denied") {
+        Notification.requestPermission(function (permission) {
+          if (permission === "granted") {
+            new Notification(s, {icon: "/static/img/chesspieces/wikipedia/wN.png"});
+          }
+        });
+      }
     };
 
-    updateStatus();
+    updateStatus(false); //don't notify since it's the initial page load
     if (opponentsTurn()) pollServer();
 };
