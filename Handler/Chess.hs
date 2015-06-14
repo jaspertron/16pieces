@@ -97,6 +97,7 @@ getGameR gameId color password = do
       addScript $ StaticR js_jquery_2_1_4_js
       addScript $ StaticR js_chessboard_0_3_0_js
       addScript $ StaticR js_chess_0_9_1_js
+      addScript $ StaticR js_lodash_js
       addScript $ StaticR js_16pieces_js
       toWidget $ [julius| buildGame(#{toJSON gameId}, #{toJSON password}, #{toJSON $ gameFen game}, #{toJSON $ toLower $ show color}); |]
       toWidget $ [cassius|
@@ -104,6 +105,10 @@ getGameR gameId color password = do
           margin-left: auto
           margin-right: auto
           max-width: 600px
+        .highlight
+            -webkit-box-shadow: inset 0 0 1000px 0 mediumspringgreen
+            -moz-box-shadow: inset 0 0 1000px 0 mediumspringgreen
+            box-shadow: inset 0 0 1000px 0 mediumspringgreen
       |]
       when (color == White) $
         toWidget $ [whamlet|

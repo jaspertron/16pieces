@@ -47,6 +47,13 @@ var buildGame = function(gameId, password, fen, color){
       $.get("/game/" + gameId + "/" + color[0] + "/" + password + "?longpoll")
       .done(function(data){
         console.log(data);
+
+        // highlight opponent's latest move
+        // note: the server doesn't keep track of move history, so
+        // the latest move will be lost if the page is refreshed
+        clearHighlights();
+        highlightSquares(diff(game.fen(), data.fen));
+
         game.load(data.fen);
         board.position(game.fen());
         if(data.joincode === null) $('#joincode-message').slideUp();})
@@ -68,16 +75,44 @@ var buildGame = function(gameId, password, fen, color){
         else setStatus(opponentsTurn()? "Waiting for opponent" : "It's your turn");
     };
     var drawBoard = function(position){
+      // preserve highlights
+      var highlighted = $('.highlight').map(function(){ return $(this).data('square'); });
+
+      // we don't want the board to be larger than the window
       var maxSize = Math.min($(window).width(), $(window).height());
+
       // we want sizeWithoutBorders to be divisible by 8
       // so that the board is completely filled by the squares
       var sizeWithoutBorders = maxSize - (maxSize % 8)
       var sizeWithBorders = sizeWithoutBorders + 4;
+
       // we also need sizeWithBorders <= maxSize
       while (sizeWithBorders >= maxSize) sizeWithBorders -= 8;
+
       $('#chessboard').width(sizeWithBorders);
       cfg.position = position;
       board = new ChessBoard('chessboard', cfg);
+
+      // restore highlights
+      highlightSquares($.makeArray(highlighted));
+    }
+    var highlightSquares = function(squares){
+      squares.forEach(function(sq){
+        $('.square-'+sq).addClass('highlight');
+      });
+    }
+    var clearHighlights = function(){
+      $('.square-55d63').removeClass('highlight');
+    }
+    // get a list of squares that are different between 2 fen strings
+    var diff = function(fen1, fen2) {
+      var diffSquares = [];
+      var g1 = new Chess(fen1);
+      var g2 = new Chess(fen2);
+      Chess().SQUARES.forEach(function(sq){
+        if(!_.isEqual(g1.get(sq), g2.get(sq))) diffSquares.push(sq);
+      });
+      return diffSquares;
     }
 
     $(window).resize(function(){
