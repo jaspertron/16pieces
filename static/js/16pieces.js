@@ -40,7 +40,7 @@ var buildGame = function(gameId, password, fen, color){
       onDragStart: onDragStart,
       onDrop: onDrop
     };
-    var board = new ChessBoard('chessboard', cfg);
+    var board;
     var game = new Chess(fen);
     var pollServer = function(){
       console.log('polling server');
@@ -67,7 +67,23 @@ var buildGame = function(gameId, password, fen, color){
         else if (game.in_draw() || game.in_stalemate() || game.in_threefold_repetition()) setStatus("Alright, we'll call it a draw.");
         else setStatus(opponentsTurn()? "Waiting for opponent" : "It's your turn");
     };
+    var drawBoard = function(position){
+      var maxSize = Math.min($(window).width(), $(window).height());
+      // we want sizeWithoutBorders to be divisible by 8
+      // so that the board is completely filled by the squares
+      var sizeWithoutBorders = maxSize - (maxSize % 8)
+      var sizeWithBorders = sizeWithoutBorders + 4;
+      // we also need sizeWithBorders <= maxSize
+      while (sizeWithBorders >= maxSize) sizeWithBorders -= 8;
+      $('#chessboard').width(sizeWithBorders);
+      cfg.position = position;
+      board = new ChessBoard('chessboard', cfg);
+    }
 
+    $(window).resize(function(){
+      drawBoard(game.fen());
+    });
+    drawBoard(fen);
     updateStatus();
     if (opponentsTurn()) pollServer();
 };

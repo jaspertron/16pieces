@@ -4,8 +4,7 @@ html, body
   display: table
   min-height: 100%
   height: auto
-  margin: 0 auto -60px
-  padding: 0 0 60px
+  margin: 0 auto 0
 .footer
   height: 60px
   padding-top: 20px

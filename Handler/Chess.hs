@@ -90,7 +90,7 @@ getGameR gameId color password = do
     provideRep $ defaultLayout $ do
       setTitle "Chess"
       toWidget [whamlet|
-        <div #chessboard style="width:400px;margin-left:auto;margin-right:auto;">
+        <div #chessboard>
         <h3 #status .text-center>
       |]
       addStylesheet $ StaticR css_chessboard_0_3_0_css
@@ -99,6 +99,12 @@ getGameR gameId color password = do
       addScript $ StaticR js_chess_0_9_1_js
       addScript $ StaticR js_16pieces_js
       toWidget $ [julius| buildGame(#{toJSON gameId}, #{toJSON password}, #{toJSON $ gameFen game}, #{toJSON $ toLower $ show color}); |]
+      toWidget $ [cassius|
+        #chessboard
+          margin-left: auto
+          margin-right: auto
+          max-width: 600px
+      |]
       when (color == White) $
         toWidget $ [whamlet|
           $maybe joincode <- gameJoinCode game
