@@ -1,7 +1,5 @@
 var buildGame = function(gameId, password, fen, color){
-    var submitMove = function(source, target, piece, preMoveFen){
-      //todo: prompt user for promotion
-      var pawnPromotion = (/1|8/.test(target) && /P/.test(piece)) ? "(Q)" : "";
+    var submitMove = function(source, target, piece, preMoveFen, pawnPromotion){
       var moveUrl = "/move/" + gameId + "/" + color[0] + "/" + password + "/" + source + "-" + target + pawnPromotion;
       $.post(moveUrl)
         .done(function(moveResponse){
@@ -17,15 +15,73 @@ var buildGame = function(gameId, password, fen, color){
     };
     var onDrop = function(source, target, piece) {
       var preMoveFen = game.fen();
-      // see if the move is legal
-      var move = game.move({
+
+      // snapback illegal moves
+      var dummyGame = new Chess(game.fen());
+      var illegal = dummyGame.move({
         from: source,
         to: target,
-        promotion: 'q' //todo: prompt user for promotion
-      });
-      if (move === null) return 'snapback'; // illegal move
-      submitMove(source, target, piece, preMoveFen);
+        promotion: 'q' //dummy promotion just to see if move is legal
+      }) === null;
+      if (illegal) return 'snapback';
+
+      //pawn promotion
+      if (/1|8/.test(target) && /P/.test(piece)) {
+
+        // modal is closed
+        var dismiss = function(){
+          removeEventHandlers();
+          board.position(preMoveFen);
+        };
+
+        // a piece is chosen
+        var promote = function(promotion){
+          removeEventHandlers();
+          $('#promotion-modal').modal('hide');
+          game.move({
+            from: source,
+            to: target,
+            promotion: promotion[1].toLowerCase()
+          });
+          board.position(game.fen());
+          submitMove(source, target, piece, preMoveFen, promotion);
+        };
+
+        var promoteQueen = function(){promote('(Q)');};
+        var promoteKnight = function(){promote('(N)');};
+        var promoteRook = function(){promote('(R)');};
+        var promoteBishop = function(){promote('(B)');};
+
+        var addEventHandlers = function(){
+          $('#promotion-modal').on('hide.bs.modal', dismiss);
+          $('#promotion-queen').on('click', promoteQueen);
+          $('#promotion-knight').on('click', promoteKnight);
+          $('#promotion-rook').on('click', promoteRook);
+          $('#promotion-bishop').on('click', promoteBishop);
+        };
+
+        var removeEventHandlers = function(){
+          $('#promotion-modal').off('hide.bs.modal', dismiss);
+          $('#promotion-queen').off('click', promoteQueen);
+          $('#promotion-knight').off('click', promoteKnight);
+          $('#promotion-rook').off('click', promoteRook);
+          $('#promotion-bishop').off('click', promoteBishop);
+        };
+
+        addEventHandlers();
+
+        $('#promotion-modal').modal();
+
+      // regular move (not pawn promotion)
+      } else {
+        game.move({
+          from: source,
+          to: target
+        });
+        submitMove(source, target, piece, preMoveFen, "");
+      }
     };
+
     var onDragStart = function(source, piece, position, orientation) {
       // only allow dragging our pieces on our turn
       var ourPiece = new RegExp(color[0]).test(piece);
@@ -83,7 +139,7 @@ var buildGame = function(gameId, password, fen, color){
 
       // we want sizeWithoutBorders to be divisible by 8
       // so that the board is completely filled by the squares
-      var sizeWithoutBorders = maxSize - (maxSize % 8)
+      var sizeWithoutBorders = maxSize - (maxSize % 8);
       var sizeWithBorders = sizeWithoutBorders + 4;
 
       // we also need sizeWithBorders <= maxSize
@@ -95,15 +151,15 @@ var buildGame = function(gameId, password, fen, color){
 
       // restore highlights
       highlightSquares($.makeArray(highlighted));
-    }
+    };
     var highlightSquares = function(squares){
       squares.forEach(function(sq){
         $('.square-'+sq).addClass('highlight');
       });
-    }
+    };
     var clearHighlights = function(){
       $('.square-55d63').removeClass('highlight');
-    }
+    };
     // get a list of squares that are different between 2 fen strings
     var diff = function(fen1, fen2) {
       var diffSquares = [];
@@ -113,7 +169,7 @@ var buildGame = function(gameId, password, fen, color){
         if(!_.isEqual(g1.get(sq), g2.get(sq))) diffSquares.push(sq);
       });
       return diffSquares;
-    }
+    };
 
     $(window).resize(function(){
       drawBoard(game.fen());

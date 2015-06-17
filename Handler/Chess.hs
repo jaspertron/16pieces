@@ -99,6 +99,8 @@ getGameR gameId color password = do
       addScript $ StaticR js_chess_0_9_1_js
       addScript $ StaticR js_lodash_js
       addScript $ StaticR js_16pieces_js
+      addScript $ StaticR js_bootstrap_js
+      pawnPromotionWidget color
       toWidget $ [julius| buildGame(#{toJSON gameId}, #{toJSON password}, #{toJSON $ gameFen game}, #{toJSON $ toLower $ show color}); |]
       toWidget $ [cassius|
         #chessboard
@@ -118,6 +120,48 @@ getGameR gameId color password = do
                 <span>@{JoinR gameId joincode}
           $nothing
         |]
+
+pawnPromotionWidget :: Color -> Widget
+pawnPromotionWidget color = do
+  toWidget [cassius|
+    #promotion-modal a
+      cursor: pointer
+    #promotion-modal ul
+      display: flex
+      flex-wrap: wrap
+      justify-content: space-between
+      padding: 0
+      width: 100%
+    #promotion-modal li
+      display: block
+      list-style-type: none
+      padding: 20px
+      margin-left: auto
+      margin-right: auto
+  |]
+  toWidget [whamlet|
+    <div #promotion-modal .modal .fade tabindex="-1" role=dialog>
+      <div .modal-dialog .modal-md>
+        <div .modal-content>
+          <div .modal-header>
+            <button type=button .close data-dismiss=modal>
+              <span>×
+            <h4 .modal-title>Choose a piece
+          <div .modal-body>
+            <ul>
+              <li>
+                <a #promotion-queen title=Queen>
+                  <img src="/static/img/chesspieces/wikipedia/#{toPathPiece color}Q.png">
+              <li>
+                <a #promotion-knight title=Knight>
+                  <img src="/static/img/chesspieces/wikipedia/#{toPathPiece color}N.png">
+              <li>
+                <a #promotion-rook title=Rook>
+                  <img src="/static/img/chesspieces/wikipedia/#{toPathPiece color}R.png">
+              <li>
+                <a #promotion-bishop title=Bishop>
+                  <img src="/static/img/chesspieces/wikipedia/#{toPathPiece color}B.png">
+  |]
 
 -- used for generating passwords and joincodes
 getRandStr :: Handler Text
