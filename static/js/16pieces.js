@@ -90,7 +90,7 @@ var buildGame = function(gameId, password, fen, color){
     };
     var cfg = {
       orientation: color,
-      pieceTheme: '/static/img/chesspieces/wikipedia/{piece}.png',
+      pieceTheme: '/static/img/chesspieces/wikipedia/{piece}.svg',
       position: fen,
       draggable: true,
       onDragStart: onDragStart,
