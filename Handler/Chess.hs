@@ -151,16 +151,16 @@ pawnPromotionWidget color = do
             <ul>
               <li>
                 <a #promotion-queen title=Queen>
-                  <img src="/static/img/chesspieces/wikipedia/#{toPathPiece color}Q.png">
+                  <img src="/static/img/chesspieces/wikipedia/#{toPathPiece color}Q.svg">
               <li>
                 <a #promotion-knight title=Knight>
-                  <img src="/static/img/chesspieces/wikipedia/#{toPathPiece color}N.png">
+                  <img src="/static/img/chesspieces/wikipedia/#{toPathPiece color}N.svg">
               <li>
                 <a #promotion-rook title=Rook>
-                  <img src="/static/img/chesspieces/wikipedia/#{toPathPiece color}R.png">
+                  <img src="/static/img/chesspieces/wikipedia/#{toPathPiece color}R.svg">
               <li>
                 <a #promotion-bishop title=Bishop>
-                  <img src="/static/img/chesspieces/wikipedia/#{toPathPiece color}B.png">
+                  <img src="/static/img/chesspieces/wikipedia/#{toPathPiece color}B.svg">
   |]
 
 -- used for generating passwords and joincodes
