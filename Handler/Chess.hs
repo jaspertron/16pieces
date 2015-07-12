@@ -113,12 +113,32 @@ getGameR gameId color password = do
             box-shadow: inset 0 0 1000px 0 mediumspringgreen
       |]
       when (color == White) $
-        toWidget $ [whamlet|
+        toWidget [whamlet|
           $maybe joincode <- gameJoinCode game
             <div #joincode-message>
               <h4 .text-center>Share this link with your opponent: 
-                <span>@{JoinR gameId joincode}
+                <code .click-to-select>@{JoinR gameId joincode}
           $nothing
+        |]
+        >>
+        toWidget [cassius|
+          .click-to-select:hover
+            border-bottom: 1px dotted
+        |]
+        >>
+        toWidget [julius|
+          var selectText = function(element) {
+            if (document.selection) {
+              var range = document.body.createTextRange();
+              range.moveToElementText(element);
+              range.select();
+            } else if (window.getSelection) {
+              var range = document.createRange();
+              range.selectNode(element);
+              window.getSelection().addRange(range);
+            }
+          }
+          $('.click-to-select').click(function(ev){selectText(ev.target);});
         |]
 
 pawnPromotionWidget :: Color -> Widget
